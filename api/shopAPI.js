@@ -14,22 +14,6 @@ shopAPI.get('/', (req, res) => {
     res.json(api)
 })
 
-shopAPI.get('/bmw', (req, res) => {
-    res.json(getCarsByBrand('bmw'))
-})
-
-shopAPI.get('/volkswagen', (req, res) => {
-    res.json(getCarsByBrand('volkswagen'))
-})
-
-shopAPI.get('/mercedes-benz', (req, res) => {
-    res.json(getCarsByBrand('mercedes-benz'))
-})
-
-shopAPI.get('/audi', (req, res) => {
-    res.json(getCarsByBrand('audi'))
-})
-
 shopAPI.get('/cars', (req, res) => {
     res.json(api.cars)
 })
@@ -37,6 +21,37 @@ shopAPI.get('/cars', (req, res) => {
 shopAPI.get('/brands', (req, res) => {
     res.json(api.brands)
 })
+
+shopAPI.use('/car/:carID', (req, res) => {
+    res.json(getCarByID(req.params.carID))
+})
+
+shopAPI.use('/:model', (req, res) => {
+    res.json(getCarsByBrand(req.params.model))
+})
+
+
+
+// shopAPI.use('/:model/:id', (req, res) => {
+//     console.log(req.params.id);
+//     res.json(getCarByID(req.params.id))
+// })
+
+
+
+// shopAPI.use('/volkswagen', (req, res) => {
+//     res.json(getCarsByBrand('volkswagen'))
+// })
+
+// shopAPI.use('/mercedes-benz', (req, res) => {
+//     res.json(getCarsByBrand('mercedes-benz'))
+// })
+
+// shopAPI.use('/audi', (req, res) => {
+//     res.json(getCarsByBrand('audi'))
+// })
+
+
 
 
 module.exports = shopAPI
