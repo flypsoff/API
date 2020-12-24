@@ -30,11 +30,11 @@ shopAPI.get('/audi', (req, res) => {
     res.json(getCarsByBrand('audi'))
 })
 
-shopAPI.use('/cars', (req, res) => {
-        res.json(api.cars)
+shopAPI.get('/cars', (req, res) => {
+    res.json(api.cars)
 })
 
-shopAPI.use('/brands', (req, res) => {
+shopAPI.get('/brands', (req, res) => {
     res.json(api.brands)
 })
 
