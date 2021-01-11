@@ -1,4 +1,6 @@
 const jwt = require('jsonwebtoken')
+const dotenv = require('dotenv')
+dotenv.config()
 
 module.exports = (req, res, next) => {
     if(req.method === 'OPRIONS') {
@@ -9,7 +11,7 @@ module.exports = (req, res, next) => {
         if(!token) {
             return res.status(401).json({message: 'Auth error'})
         }
-        const decoded = jwt.verify(token, 'secret-key')
+        const decoded = jwt.verify(token, process.env.SECRET_KEY)
         req.user = decoded
         next()
     } catch (error) {
