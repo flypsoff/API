@@ -1,4 +1,4 @@
-const api = {
+const shopItems = {
     brands: [
         {name: 'BMW', id: 1}, 
         {name: 'Mercedes-Benz', id: 2}, 
@@ -24,4 +24,4 @@ const api = {
     ]
 }
 
-module.exports = api 
+module.exports = shopItems 
