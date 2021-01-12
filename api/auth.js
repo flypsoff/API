@@ -12,6 +12,8 @@ const User = require('../DB/User')
 
 const authMiddleware = require('../middleware/auth')
 
+auth.get('/', (req, res) => res.send({message: 'auth'}))
+
 auth.post('/registration', [
     check('email', 'Uncorrect email').isEmail(),
     check('password', 'Password must be longer than 7').isLength({min: 7}),
@@ -35,7 +37,19 @@ auth.post('/registration', [
         }
 
         const hashPassword = await bcrypt.hash(password, 8)
-        const user = new User({email, password: hashPassword, name, age, country, status: 'user', posts: [] })
+        const user = new User({
+            email, 
+            password: hashPassword, 
+            name, 
+            age,
+            country, 
+            status: 'user', 
+            posts: [],
+            todos: {
+                deleted: [],
+                current: []
+            }
+          })
         await user.save()
 
         return res.json({message: 'User was created'})   
@@ -70,7 +84,6 @@ auth.post('/login', async (req, res) => {
                 age: user.age,
                 country: user.country,
                 status: user.status,
-                posts: user.posts
             }
         })
     } catch (e) {
@@ -93,7 +106,6 @@ auth.get('/authorization', authMiddleware, async (req, res) => {
                 age: user.age,
                 country: user.country,
                 status: user.status,
-                posts: user.posts
             }
         })
     } catch (e) {
