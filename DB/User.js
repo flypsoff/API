@@ -21,6 +21,9 @@ const user = new mongoose.Schema({
     },
     posts: {
         type: Array
+    },
+    todos:  {
+        type: Object
     }
 })
 
