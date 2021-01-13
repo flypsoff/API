@@ -12,8 +12,6 @@ const User = require('../DB/User')
 
 const authMiddleware = require('../middleware/auth')
 
-auth.get('/', (req, res) => res.send({message: 'auth'}))
-
 auth.post('/registration', [
     check('email', 'Uncorrect email').isEmail(),
     check('password', 'Password must be longer than 7').isLength({min: 7}),
@@ -27,8 +25,6 @@ auth.post('/registration', [
             return res.status(400).json({message: 'Uncorrect request', errors})
         }
         const { email, password, name, age, country } = req.body
-
-        
 
         const candidate = await User.findOne({email})
 
@@ -46,7 +42,7 @@ auth.post('/registration', [
             status: 'user', 
             posts: [],
             todos: {
-                deleted: [],
+                completed: [],
                 current: []
             }
           })
@@ -73,7 +69,7 @@ auth.post('/login', async (req, res) => {
             return res.status(400).json({message: 'Invalid password'})
         }
 
-        const token = jwt.sign({id: user.id}, process.env.SECRET_KEY, {expiresIn: '1h'})
+        const token = jwt.sign({id: user.id}, process.env.SECRET_KEY, {expiresIn: '1hr'})
 
         return res.json({
             token,
@@ -96,7 +92,7 @@ auth.get('/authorization', authMiddleware, async (req, res) => {
     try {
         const user = await User.findOne({_id: req.user.id})
 
-        const token = jwt.sign({id: user.id}, process.env.SECRET_KEY, {expiresIn: '1h'})
+        const token = jwt.sign({id: user.id}, process.env.SECRET_KEY, {expiresIn: '1hr'})
         return res.json({
             token,
             user: {
