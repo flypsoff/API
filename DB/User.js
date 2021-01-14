@@ -23,7 +23,10 @@ const user = new mongoose.Schema({
         type: Array
     },
     todos:  {
-        type: Object
+        type: Array
+    },
+    cart:  {
+        type: Array
     }
 })
 
