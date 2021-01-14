@@ -8,7 +8,8 @@ const User = require('../DB/User')
 todos.get('/current', authMiddleware, async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.user.id })
-        return res.json({ todos: user.todos.current })
+        const isNotCompleted = user.todos.filter(item => !item.completed)
+        return res.json({ todos: isNotCompleted })
     } catch (e) {
         console.log(e);
         res.send({ message: 'Server error' })
@@ -18,71 +19,75 @@ todos.get('/current', authMiddleware, async (req, res) => {
 todos.get('/completed', authMiddleware, async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.user.id })
-        return res.json({ todos: user.todos.completed })
+        const isCompleted = user.todos.filter(item => item.completed)
+        return res.json({ todos: isCompleted })
     } catch (e) {
         console.log(e);
         res.send({ message: 'Server error' })
     }
 })
 
-todos.patch('/current/add', authMiddleware, async (req, res) => {
+todos.patch('/current', authMiddleware, async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.user.id })
-        const todo = req.body.todo
         if (!user) {
             return res.status(404).json({ message: 'User with this id is not found' })
+        }
+        const todo = req.body.todo
+        if (!todo) {
+            return res.status(404).json({ message: 'Please try againg' })
         }
         await User.updateOne({ _id: req.user.id },
             {
                 $set: {
-                    todos: {
-                        completed: user.todos.completed,
-                        current: [
-                            todo,
-                            ...user.todos.current
-                        ]
-                    }
+                    todos: [
+                        todo,
+                        ...user.todos
+                    ]
                 }
             })
 
-        res.json({ message: 'Todo was added', todo })
+        const todos = [
+            req.body.todo,
+            ...user.todos.filter( item => !item.completed )
+        ]
+        
+        res.json({ message: 'Todo was added', todos })
     } catch (e) {
         console.log(e);
         res.send({ message: 'Server error' })
     }
 })
 
-todos.patch('/completed/add', authMiddleware, async (req, res) => {
+todos.patch('/completed', authMiddleware, async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.user.id })
         if (!user) {
             return res.status(404).json({ message: 'User with this id is not found' })
         }
-        let deleted
-        const newCurrentTodos = user.todos.current.filter(item => {
-            if (item.id === req.body.id) {
-                deleted = item
-                return false
+
+        const id = req.body.id
+        if (!id) {
+            return res.status(404).json({ message: 'Please try againg' })
+        }
+
+        const completed = user.todos.map(item => {
+            if (item.id === id) {
+                item.completed = true
             }
-            return true
+            return item
         })
 
         await User.updateOne({ _id: req.user.id },
             {
                 $set: {
-                    todos: {
-                        completed: [
-                            deleted,
-                            ...user.todos.completed
-                        ],
-                        current: [
-                            ...newCurrentTodos
-                        ]
-                    }
+                    todos: completed
                 }
-            })
+            })  
 
-        res.json({ message: 'Updated is done', deleted, newCurrentTodos })
+        const todos = user.todos.filter(item => !item.completed)
+
+        res.json({ message: 'Todo is completed', todos })
     } catch (e) {
         console.log(e);
         res.send({ message: 'Server error' })
@@ -95,19 +100,22 @@ todos.patch('/completed/delete', authMiddleware, async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: 'User with this id is not found' })
         }
+
+        const id = req.body.id
+        if (!id) {
+            return res.status(404).json({ message: 'Please try againg' })
+        }
         
-        const newCompleted = user.todos.completed.filter(item => item.id !== req.body.id)
+        const deletedTodos = user.todos.filter(item => item.id === id ? false : true)
+
         await User.updateOne({ _id: req.user.id },
             {
                 $set: {
-                    todos: {
-                        ...user.todos,
-                        completed: newCompleted
-                    }
+                    todos: deletedTodos
                 }
-            })
-        
-        res.send({ message: 'Todo was deleted', newCompleted })
+            })  
+
+        res.send({ message: 'Todo was deleted', deletedTodos })
     } catch (e) {
         console.log(e);
         res.send({ message: 'Server error' })
