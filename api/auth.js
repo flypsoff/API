@@ -41,10 +41,7 @@ auth.post('/registration', [
             country, 
             status: 'user', 
             posts: [],
-            todos: {
-                completed: [],
-                current: []
-            }
+            todos: []
           })
         await user.save()
 
@@ -79,7 +76,7 @@ auth.post('/login', async (req, res) => {
                 name: user.name,
                 age: user.age,
                 country: user.country,
-                status: user.status,
+                status: user.status
             }
         })
     } catch (e) {
