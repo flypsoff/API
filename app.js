@@ -10,6 +10,7 @@ connectDB()
 const shopAPI = require('./api/shopAPI')
 const auth = require('./api/auth')
 const todos = require('./api/todos')
+const account = require('./api/account')
 
 const corsOption = {
     origin: 'http://localhost:3000/'
@@ -22,5 +23,6 @@ app.use(express.json({ extended: true }))
 app.use('/api', shopAPI)
 app.use('/auth', auth)
 app.use('/todos', todos)
+app.use('/account', account)
 
 app.listen(PORT, () => console.log("Server has been started"))
