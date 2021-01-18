@@ -10,8 +10,11 @@ const user = new mongoose.Schema({
     name: {
         type: String
     },
-    age: {
-        type: Number
+    surname: {
+        type: String
+    },
+    birthday: {
+        type: String
     },
     country: {
         type: String
@@ -26,6 +29,9 @@ const user = new mongoose.Schema({
         type: Array
     },
     cart:  {
+        type: Array
+    },
+    deletedTodos:{
         type: Array
     }
 })
