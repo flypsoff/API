@@ -14,18 +14,16 @@ const authMiddleware = require('../middleware/auth')
 
 auth.post('/registration', [
     check('email', 'Uncorrect email').isEmail(),
-    check('password', 'Password must be longer than 7').isLength({min: 7}),
+    check('password', 'Password must be longer than 7').isLength({min: 1}),
     check('name').isAlpha().withMessage('Name must contain only letters'),
-    check('country').isAlpha().withMessage('Country must contain only letters'),
-    check('age', 'Age must contain only numbers').isNumeric(),
+    check('country').isAlpha().withMessage('Country must contain only letters')
     ], async (req, res) => {
     try {
         const errors = validationResult(req)
         if(!errors.isEmpty()) {
             return res.status(400).json({message: 'Uncorrect request', errors})
         }
-        const { email, password, name, age, country } = req.body
-
+        const { email, password, name, surname, birthday, country } = req.body
         const candidate = await User.findOne({email})
 
         if(candidate) {
@@ -36,12 +34,14 @@ auth.post('/registration', [
         const user = new User({
             email, 
             password: hashPassword, 
-            name, 
-            age,
+            name,
+            surname,
+            birthday: birthday.slice(0, 11),
             country, 
             status: 'user', 
             posts: [],
-            todos: []
+            todos: [],
+            deletedTodos: []
           })
         await user.save()
 
@@ -74,7 +74,8 @@ auth.post('/login', async (req, res) => {
                 id: user.id,
                 email: user.email,
                 name: user.name,
-                age: user.age,
+                surname: user.surname,
+                birthday: user.birthday,
                 country: user.country,
                 status: user.status
             }
@@ -96,7 +97,8 @@ auth.get('/authorization', authMiddleware, async (req, res) => {
                 id: user.id,
                 email: user.email,
                 name: user.name,
-                age: user.age,
+                surname: user.surname,
+                birthday: user.birthday,
                 country: user.country,
                 status: user.status,
             }
