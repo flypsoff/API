@@ -8,19 +8,17 @@ const User = require('../DB/User')
 todos.get('/current', authMiddleware, async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.user.id })
-        const isNotCompleted = user.todos.filter(item => !item.completed)
-        return res.json({ todos: isNotCompleted })
+        return res.json({ todos: user.todos })
     } catch (e) {
         console.log(e);
         res.send({ message: 'Server error' })
     }
 })
 
-todos.get('/completed', authMiddleware, async (req, res) => {
+todos.get('/deleted', authMiddleware, async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.user.id })
-        const isCompleted = user.todos.filter(item => item.completed)
-        return res.json({ todos: isCompleted })
+        return res.json({ deletedTodos: user.deletedTodos })
     } catch (e) {
         console.log(e);
         res.send({ message: 'Server error' })
@@ -49,7 +47,7 @@ todos.patch('/current', authMiddleware, async (req, res) => {
 
         const todos = [
             req.body.todo,
-            ...user.todos.filter( item => !item.completed )
+            ...user.todos
         ]
         
         res.json({ message: 'Todo was added', todos })
@@ -59,7 +57,7 @@ todos.patch('/current', authMiddleware, async (req, res) => {
     }
 })
 
-todos.patch('/completed', authMiddleware, async (req, res) => {
+todos.patch('/delete', authMiddleware, async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.user.id })
         if (!user) {
@@ -71,51 +69,85 @@ todos.patch('/completed', authMiddleware, async (req, res) => {
             return res.status(404).json({ message: 'Please try againg' })
         }
 
-        const completed = user.todos.map(item => {
-            if (item.id === id) {
-                item.completed = true
+        let deleted
+        const todos = user.todos.filter(item => {
+            if(item.id === id) {
+                deleted = item
+                return false
             }
-            return item
+            return true
         })
 
         await User.updateOne({ _id: req.user.id },
             {
                 $set: {
-                    todos: completed
+                    todos: todos,
+                    deletedTodos: [
+                        deleted, 
+                        ...user.deletedTodos
+                    ]
                 }
-            })  
+            })
 
-        const todos = user.todos.filter(item => !item.completed)
-
-        res.json({ message: 'Todo is completed', todos })
+        res.json({ message: 'Todo is deleted', todos })
     } catch (e) {
         console.log(e);
         res.send({ message: 'Server error' })
     }
 })
 
-todos.patch('/completed/delete', authMiddleware, async (req, res) => {
+todos.patch('/deleted/delete', authMiddleware, async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.user.id })
         if (!user) {
             return res.status(404).json({ message: 'User with this id is not found' })
         }
-
         const id = req.body.id
         if (!id) {
             return res.status(404).json({ message: 'Please try againg' })
         }
         
-        const deletedTodos = user.todos.filter(item => item.id === id ? false : true)
+        const deletedTodos = user.deletedTodos.filter(item => item.id === id ? false : true)
 
         await User.updateOne({ _id: req.user.id },
             {
                 $set: {
-                    todos: deletedTodos
+                    deletedTodos: deletedTodos
                 }
             })  
 
         res.send({ message: 'Todo was deleted', deletedTodos })
+    } catch (e) {
+        console.log(e);
+        res.send({ message: 'Server error' })
+    }
+})
+
+todos.patch('/current/change', authMiddleware, async (req, res) => {
+    try {
+        const user = await User.findOne({ _id: req.user.id })
+        if (!user) {
+            return res.status(404).json({ message: 'User with this id is not found' })
+        }
+        const id = req.body.id
+        const checked = req.body.checked
+        if (!id) {
+            return res.status(404).json({ message: 'Please try againg' })
+        }
+        const todos = user.todos.map(item => {
+            if(item.id === id) {
+                item.completed = checked
+            }
+            return item
+        })
+        await User.updateOne({ _id: req.user.id },
+            {
+                $set: {
+                    todos: todos
+                }
+            })  
+
+        res.send({ message: 'Checkbox was changed', todos })
     } catch (e) {
         console.log(e);
         res.send({ message: 'Server error' })
