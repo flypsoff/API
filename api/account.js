@@ -4,7 +4,6 @@ const bcrypt = require('bcryptjs')
 
 const { check, validationResult } = require('express-validator')
 
-
 const authMiddleware = require('../middleware/auth')
 
 const User = require('../DB/User')
@@ -175,11 +174,6 @@ account.patch('/password', authMiddleware, async (req, res) => {
         
         const oldPassword = req.body.oldPassword
         const newPassword = req.body.newPassword
-
-        console.log(oldPassword);
-
-        console.log(newPassword);
-
         
         if (!newPassword || !oldPassword) {
             arrauOfError.push('Fields must be correct')
