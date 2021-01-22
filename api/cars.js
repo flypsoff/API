@@ -7,7 +7,12 @@ const Cars = require('../DB/Cars')
 cars.get('/', async (req, res) => {
     try {
         const params = req.query
-        let cars = await Cars.find({})
+        let cars
+        if(params.carState) {
+            cars = await Cars.find({carState: params.carState})
+        } else {
+            cars = await Cars.find({})
+        }
         if(params.brand) {
             cars = cars.filter(car => car.brand === params.brand)
         }
@@ -29,6 +34,7 @@ cars.get('/', async (req, res) => {
         if(params.toPrice) {
             cars = cars.filter(car => car.price <= params.toPrice)
         }
+        
 
         res.json({cars})
     } catch (e) {
@@ -52,36 +58,20 @@ cars.get('/brands', async (req, res) => {
     }
 })
 
-// cars.get('/:brand', async (req, res) => {
-//     try {
-//         const brand = req.params.brand
-//         const cars = await Cars.find({brand: brand})
-//         res.json({cars})
-//     } catch (e) {
-//         console.log(e);
-//         res.send({message: 'Server error'})
-//     }
-// })
+cars.get('/car/:carID', async (req, res) => {
+    try {
+        const carID = req.params.carID
+        const car = await Cars.find({carID})
+        if(car.length > 0) {
+            res.json({car: car[0]})
+        } else {
+            res.json({message: `Car with id ${carID} is not found`})
+        }
+    } catch (e) {
+        console.log(e);
+        res.send({message: 'Server error'})
+    }
+})
 
-// shop.get('/cars', (req, res) => {
-//     res.json(shopItems.cars)
-// })
-
-// shop.get('/brands', (req, res) => {
-//     res.json(shopItems.brands)
-// })
-
-// shop.get('/car/:carID', (req, res) => {
-//     const car = getCarByID(req.params.carID)
-//     if(car.length > 0) {
-//         res.json(car)
-//     } else {
-//         res.status(404).send({error: `Car with id ${req.params.carID} not found`})
-//     }
-// })
-
-// shop.get('/:model', (req, res) => {
-//     res.json(getCarsByBrand(req.params.model))
-// })
 
 module.exports = cars
