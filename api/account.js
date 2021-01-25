@@ -206,4 +206,19 @@ account.patch('/password', authMiddleware, async (req, res) => {
     }
 })
 
+account.delete('/delete', authMiddleware, async (req, res) => {
+    try {
+        const user = await User.findOne({ _id: req.user.id })
+        if (!user) {
+            return res.status(404).json({ message: 'User with this id is not found' })
+        }
+        await User.deleteOne({ _id: req.user.id })
+
+        res.json({ message: 'Account was deleted'})
+    } catch (e) {
+        console.log(e);
+        res.send({ message: 'Server error' })
+    }
+})
+
 module.exports = account
