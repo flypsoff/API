@@ -1,9 +1,6 @@
 const mongoose = require('mongoose')
 
 const cars = new mongoose.Schema({
-    carID: {
-        type: String
-    },
     brand: {
         type: String
     }, 
@@ -19,16 +16,51 @@ const cars = new mongoose.Schema({
     price: {
         type: Number
     },
-        bodyType: {
+    description: {
+        type: String
+    },
+    bodyType: {
         type: String
     },
     engineCapacity: {
         type: String
     },
-    description: {
+    location: {
+        type: String
+    },
+    mileage: {
+        type: Number
+    },
+    fuelType: {
+        type: String
+    },
+    hp: {
+        type: Number
+    },
+    color: {
+        type: String
+    },
+    transmission: {
+        type: String
+    },
+    driveTrain: {
+        type: String
+    },
+    owner: {
+        type: String
+    },
+    phoneNumber: {
+        type: Number
+    },
+    carID: {
+        type: String
+    },
+    // img: {
+    //     type: 
+    // }
+    carState: {
         type: String
     }
-
 })
 
 const Cars = mongoose.model('cars', cars)
