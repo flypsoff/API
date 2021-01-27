@@ -14,7 +14,7 @@ cars.get('/', async (req, res) => {
             cars = await Cars.find({})
         }
         if(params.brand) {
-            cars = cars.filter(car => car.brand === params.brand)
+            cars = cars.filter(car => car.brand.toLowerCase() === params.brand.toLowerCase())
         }
         if(params.carClass) {
             cars = cars.filter(car => car.class === params.carClass)
@@ -34,7 +34,6 @@ cars.get('/', async (req, res) => {
         if(params.toPrice) {
             cars = cars.filter(car => car.price <= params.toPrice)
         }
-        
 
         res.json({cars})
     } catch (e) {
@@ -48,7 +47,7 @@ cars.get('/brands', async (req, res) => {
         const set = new Set();
         const cars = await Cars.find({})
         cars.forEach(car => {
-            set.add(car.brand)
+            set.add(car.brand.toLowerCase())
         })
         const brands = Array.from(set)
         res.json({brands})
