@@ -2,7 +2,10 @@ const e = require('express')
 const express = require('express')
 const cars = express.Router()
 
+const authMiddleware = require('../middleware/auth')
+
 const Cars = require('../DB/Cars')
+const User = require('../DB/User')
 
 cars.get('/', async (req, res) => {
     try {
@@ -37,7 +40,7 @@ cars.get('/', async (req, res) => {
 
         res.json({cars})
     } catch (e) {
-        console.log(e);
+        console.log(e)
         res.send({message: 'Server error'})
     }
 })
@@ -52,7 +55,7 @@ cars.get('/brands', async (req, res) => {
         const brands = Array.from(set)
         res.json({brands})
     } catch (e) {
-        console.log(e);
+        console.log(e)
         res.send({message: 'Server error'})
     }
 })
@@ -67,7 +70,46 @@ cars.get('/car/:carID', async (req, res) => {
             res.json({message: `Car with id ${carID} is not found`})
         }
     } catch (e) {
-        console.log(e);
+        console.log(e)
+        res.send({message: 'Server error'})
+    }
+})
+
+cars.post('/addcar', authMiddleware, async (req, res) => {
+    try {
+        const user = await User.findOne({ _id: req.user.id })
+        if (!user) {
+            res.status(401).send({message: 'First need login'})
+        }
+        const car = req.body.car
+        const newCar = new Cars({
+            brand: car.brand,
+            model: car.model,
+            class: car.carClass,
+            year: car.year,
+            price: car.price,
+            description: car.description,
+            bodyType: car.bodyType,
+            info: {
+                engineCapacity: car.engineCapacity,
+                location: car.location,
+                mileage: car.mileage,
+                fuelType: car.fuelType,
+                hp: car.hp,
+                color: car.color,
+                transmission: car.transmission,
+                driveTrain: car.driveTrain,
+                owner: user.name,
+                phoneNumber: car.phoneNumber
+            },
+            carID: req.body.carID,
+            img: 'https://lh3.googleusercontent.com/proxy/XXI4BK-TROoX2qd-bom1l0XaJBhR2pkN_ZGyiVp39DqQNKidCPvPO6TBpJ-amvFWao4o9AclzEsWhzvjvZ2_Mw',
+            carState: car.carState
+          })
+        await newCar.save()
+        res.send({message: 'Car was added', newCar})
+    } catch (e) {
+        console.log(e)
         res.send({message: 'Server error'})
     }
 })
