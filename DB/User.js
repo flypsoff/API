@@ -28,9 +28,6 @@ const user = new mongoose.Schema({
     todos:  {
         type: Array
     },
-    cart:  {
-        type: Array
-    },
     deletedTodos:{
         type: Array
     }
