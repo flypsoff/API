@@ -22,42 +22,44 @@ const cars = new mongoose.Schema({
     bodyType: {
         type: String
     },
-    engineCapacity: {
-        type: String
-    },
-    location: {
-        type: String
-    },
-    mileage: {
-        type: Number
-    },
-    fuelType: {
-        type: String
-    },
-    hp: {
-        type: Number
-    },
-    color: {
-        type: String
-    },
-    transmission: {
-        type: String
-    },
-    driveTrain: {
-        type: String
-    },
-    owner: {
-        type: String
-    },
-    phoneNumber: {
-        type: Number
+    info: {
+        engineCapacity: {
+            type: String
+        },
+        location: {
+            type: String
+        },
+        mileage: {
+            type: Number
+        },
+        fuelType: {
+            type: String
+        },
+        hp: {
+            type: Number
+        },
+        color: {
+            type: String
+        },
+        transmission: {
+            type: String
+        },
+        driveTrain: {
+            type: String
+        },
+        owner: {
+            type: String
+        },
+        phoneNumber: {
+            type: Number
+        },
     },
     carID: {
         type: String
     },
-    // img: {
-    //     type: 
-    // }
+    img: {
+        type: String
+    },
     carState: {
         type: String
     }
