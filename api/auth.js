@@ -67,7 +67,7 @@ auth.post('/login', async (req, res) => {
         }
 
         const token = jwt.sign({id: user.id}, process.env.SECRET_KEY, {expiresIn: '1hr'})
-
+        
         return res.json({
             token,
             user: {
@@ -77,7 +77,8 @@ auth.post('/login', async (req, res) => {
                 surname: user.surname,
                 birthday: user.birthday,
                 country: user.country,
-                status: user.status
+                status: user.status,
+                posts: user.posts
             }
         })
     } catch (e) {
@@ -101,6 +102,7 @@ auth.get('/authorization', authMiddleware, async (req, res) => {
                 birthday: user.birthday,
                 country: user.country,
                 status: user.status,
+                posts: user.posts
             }
         })
     } catch (e) {
