@@ -106,8 +106,28 @@ cars.post('/addcar', authMiddleware, async (req, res) => {
             img: 'https://lh3.googleusercontent.com/proxy/XXI4BK-TROoX2qd-bom1l0XaJBhR2pkN_ZGyiVp39DqQNKidCPvPO6TBpJ-amvFWao4o9AclzEsWhzvjvZ2_Mw',
             carState: car.carState
           })
+        
+        const post = { 
+            brand: car.brand, 
+            model: car.model,
+            price: car.price,
+            year: car.year,
+            carID: req.body.carID 
+        }
+         
+        await User.updateOne({ _id: req.user.id },
+        {
+            $set: {
+                posts: [
+                    post,
+                    ...user.posts
+                ]
+            }
+        })
+
         await newCar.save()
-        res.send({message: 'Car was added', newCar})
+            brand: car.brand,
+            res.send({message: 'Car was added', newCar, post })
     } catch (e) {
         console.log(e)
         res.send({message: 'Server error'})
