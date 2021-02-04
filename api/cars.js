@@ -79,8 +79,13 @@ cars.post('/addcar', authMiddleware, async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.user.id })
         if (!user) {
-            res.status(401).send({message: 'First need login'})
+            return res.status(401).send({message: 'First need login'})
         }
+
+        if(user.posts.length > 2) {
+            return res.status(403).send({message: 'You can post only THREE car'})
+        }
+
         const car = req.body.car
         const newCar = new Cars({
             brand: car.brand,
@@ -103,7 +108,7 @@ cars.post('/addcar', authMiddleware, async (req, res) => {
                 phoneNumber: car.phoneNumber
             },
             carID: req.body.carID,
-            img: 'https://lh3.googleusercontent.com/proxy/XXI4BK-TROoX2qd-bom1l0XaJBhR2pkN_ZGyiVp39DqQNKidCPvPO6TBpJ-amvFWao4o9AclzEsWhzvjvZ2_Mw',
+            img: car.img,
             carState: car.carState
           })
         
@@ -126,13 +131,46 @@ cars.post('/addcar', authMiddleware, async (req, res) => {
         })
 
         await newCar.save()
-            brand: car.brand,
-            res.send({message: 'Car was added', newCar, post })
+
+        res.send({message: 'Car was added', newCar, post })
     } catch (e) {
         console.log(e)
         res.send({message: 'Server error'})
     }
 })
 
+cars.patch('/deletecar', authMiddleware, async (req, res) => {
+    try {
+        const user = await User.findOne({ _id: req.user.id })
+        if (!user) {
+            return res.status(401).send({message: 'First need login'})
+        }
+
+        const id = req.body.carID
+
+        let deleted
+        const deletedCar = user.posts.filter(item => {
+            if(item.carID === id) {
+                deleted = item
+                return false
+            }
+            return true
+        })
+
+        await User.updateOne({ _id: req.user.id },
+            {
+                $set: {
+                    posts: deletedCar
+                }
+            })
+
+        await Cars.deleteOne({ carID: id})
+
+        res.send({message: 'Car was deleted', deletedPost: deletedCar})
+    } catch (e) {
+        console.log(e)
+        res.send({message: 'Server error'})
+    }
+})
 
 module.exports = cars
